@@ -14,7 +14,7 @@ impl From<i64> for Integer {
 impl From<BigInt> for Integer {
     #[inline]
     fn from(value: BigInt) -> Self {
-        // TODO: Look into more efficient conversion.
+        // TODO: Make this conversion more efficient.
         Self(rug::Integer::from_str_radix(&value.to_str_radix(36), 36).unwrap())
     }
 }
