@@ -1,3 +1,5 @@
+use crate::fmt::Latex;
+
 use core::fmt;
 
 /// A mathematical expression.
@@ -9,12 +11,26 @@ pub enum Expression {
     Add(Box<Expression>, Box<Expression>),
 }
 
-// Implement the Display trait for pretty-printing expressions.
 impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Expression::Symbol(s) => write!(f, "{s}"),
             Expression::Add(a, b) => write!(f, "({a} + {b})"),
+        }
+    }
+}
+
+impl Latex for Expression {
+    fn latex(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Expression::Symbol(s) => write!(f, "{s}"),
+            Expression::Add(a, b) => {
+                write!(f, r"\left(")?;
+                a.latex(f)?;
+                write!(f, r" + ")?;
+                b.latex(f)?;
+                write!(f, r"\right)")
+            }
         }
     }
 }

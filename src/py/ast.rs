@@ -1,3 +1,4 @@
+use crate::fmt::ToLatex;
 use crate::rs::ast::Expression;
 use pyo3::prelude::*;
 
@@ -16,7 +17,7 @@ impl PyExpression {
     }
 
     fn _repr_latex_(&self) -> String {
-        format!("${}$", self.0)
+        format!("${}$", self.0.to_latex())
     }
 }
 
