@@ -1,23 +1,15 @@
+//! Python bindings.
+
 use pyo3::prelude::*;
 
-#[pyclass]
-struct TestClass;
+mod ast;
 
-#[pymethods]
-impl TestClass {
-    #[new]
-    fn new() -> Self {
-        TestClass
-    }
-
-    #[allow(clippy::unused_self)]
-    fn _repr_latex_(&self) -> String {
-        "$x^2 + y^2 + z^2$".to_string()
-    }
-}
-
+/// This module is implemented in Rust.
 #[pymodule]
-mod cas {
-    #[pymodule_export]
-    use super::TestClass;
+fn cas(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<ast::PyExpression>()?;
+    m.add_function(wrap_pyfunction!(ast::symbol, m)?)
 }
+
+#[cfg(test)]
+mod tests {}

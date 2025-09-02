@@ -1,4 +1,5 @@
 fn main() {
+    // TODO: This should be a REPL eventually.
     println!("Hello, world!");
 }
 
