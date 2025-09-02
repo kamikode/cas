@@ -1,5 +1,5 @@
 use crate::fmt::Latex;
-use crate::num::Integer;
+use crate::types::{Integer, Symbol};
 use core::fmt;
 use core::ops::Add;
 
@@ -9,7 +9,7 @@ pub enum Expression {
     /// An integer.
     Integer(Integer),
     /// A symbol, like 'x'.
-    Symbol(String), // TODO: Strings for symbols should be restricted.
+    Symbol(Symbol),
     /// Binary addition operation.
     Add(Box<Expression>, Box<Expression>),
 }
@@ -78,8 +78,8 @@ mod tests {
 
     #[test]
     fn add_works() {
-        let x = Expression::Symbol("x".to_string());
-        let y = Expression::Symbol("y".to_string());
+        let x = Expression::Symbol(Symbol::try_from("x".to_string()).unwrap());
+        let y = Expression::Symbol(Symbol::try_from("y".to_string()).unwrap());
         let expected = Expression::Add(Box::new(x.clone()), Box::new(y.clone()));
         assert_eq!(x.clone() + y.clone(), expected);
         assert_eq!(x.clone() + &y, expected);
