@@ -8,6 +8,8 @@ name = "cas"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pyo3 = "0.26"
+rug = "1.28"
+num-bigint = "*"
+pyo3 = { version = "0.26.0", features = ["num-bigint"] }
 
 [dev-dependencies]

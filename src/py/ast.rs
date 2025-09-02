@@ -1,18 +1,43 @@
+//! Abstract Syntax Tree.
 use crate::ast::Expression;
 use crate::fmt::ToLatex;
+use num_bigint::BigInt;
 use pyo3::prelude::*;
 
-/// A mathematical expression.
 #[pyclass(name = "Expression", module = "cas")]
-#[derive(Debug, Clone)]
-pub(in crate::py) struct PyExpression(Expression);
+#[derive(Debug)]
+pub struct PyExpression(pub Expression);
+
+#[derive(FromPyObject)]
+enum PyExpressionOrNumber<'py> {
+    PyExpression(PyRef<'py, PyExpression>),
+    Int(i64),
+    BigInt(BigInt),
+}
+
+impl From<PyExpressionOrNumber<'_>> for Expression {
+    fn from(other: PyExpressionOrNumber<'_>) -> Expression {
+        match other {
+            PyExpressionOrNumber::PyExpression(e) => e.0.clone(),
+            PyExpressionOrNumber::Int(i) => Expression::Integer(i.into()),
+            PyExpressionOrNumber::BigInt(i) => Expression::Integer(i.into()),
+        }
+    }
+}
 
 #[pymethods]
 impl PyExpression {
-    fn __add__(&self, other: &PyExpression) -> PyExpression {
+    fn __add__(&self, other: PyExpressionOrNumber) -> PyExpression {
         PyExpression(Expression::Add(
             Box::new(self.0.clone()),
-            Box::new(other.0.clone()),
+            Box::new(other.into()),
+        ))
+    }
+
+    fn __radd__(&self, other: PyExpressionOrNumber) -> PyExpression {
+        PyExpression(Expression::Add(
+            Box::new(other.into()),
+            Box::new(self.0.clone()),
         ))
     }
 
