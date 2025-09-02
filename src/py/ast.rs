@@ -1,5 +1,5 @@
+use crate::ast::Expression;
 use crate::fmt::ToLatex;
-use crate::rs::ast::Expression;
 use pyo3::prelude::*;
 
 /// A mathematical expression.
