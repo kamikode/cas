@@ -1,5 +1,5 @@
-//! Abstract Syntax Tree.
-use crate::ast::Expression;
+//! Expression.
+use crate::expression::Expression;
 use crate::fmt::ToLatex;
 use crate::types::Symbol;
 use num_bigint::BigInt;
