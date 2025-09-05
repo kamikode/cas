@@ -8,8 +8,8 @@ use core::ops::Add;
 pub enum Expression {
     /// An integer.
     Integer(Integer),
-    /// A symbol, like 'x'.
-    Symbol(Symbol),
+    /// A variable specified by a symbol, like 'x'.
+    Variable(Symbol),
     /// Binary addition operation.
     Add(Box<Expression>, Box<Expression>),
 }
@@ -26,7 +26,7 @@ impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Expression::Integer(i) => write!(f, "{i}"),
-            Expression::Symbol(s) => write!(f, "{s}"),
+            Expression::Variable(s) => write!(f, "{s}"),
             Expression::Add(a, b) => write!(f, "({a} + {b})"),
         }
     }
@@ -36,7 +36,7 @@ impl Latex for Expression {
     fn latex(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Expression::Integer(i) => write!(f, "{i}"),
-            Expression::Symbol(s) => write!(f, "{s}"),
+            Expression::Variable(s) => write!(f, "{s}"),
             Expression::Add(a, b) => {
                 write!(f, r"\left(")?;
                 a.latex(f)?;
@@ -54,8 +54,8 @@ mod tests {
 
     #[test]
     fn add_works() {
-        let x = Expression::Symbol(Symbol::try_from("x".to_string()).unwrap());
-        let y = Expression::Symbol(Symbol::try_from("y".to_string()).unwrap());
+        let x = Expression::Variable(Symbol::try_from("x".to_string()).unwrap());
+        let y = Expression::Variable(Symbol::try_from("y".to_string()).unwrap());
         let expected = Expression::Add(Box::new(x.clone()), Box::new(y.clone()));
         assert_eq!(x + y, expected);
     }

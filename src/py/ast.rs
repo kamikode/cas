@@ -49,10 +49,10 @@ impl PyExpression {
 }
 
 /// Creates a symbol.
-#[pyfunction(name = "Symbol")]
-pub(in crate::py) fn symbol(name: String) -> PyResult<PyExpression> {
+#[pyfunction(name = "Variable")]
+pub(in crate::py) fn variable(name: String) -> PyResult<PyExpression> {
     match Symbol::try_from(name) {
-        Ok(s) => Ok(PyExpression(Expression::Symbol(s))),
+        Ok(s) => Ok(PyExpression(Expression::Variable(s))),
         Err(e) => Err(PyErr::new::<PyValueError, String>(e)),
     }
 }

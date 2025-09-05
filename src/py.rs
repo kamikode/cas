@@ -8,7 +8,7 @@ mod ast;
 #[pymodule]
 fn cas(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ast::PyExpression>()?;
-    m.add_function(wrap_pyfunction!(ast::symbol, m)?)
+    m.add_function(wrap_pyfunction!(ast::variable, m)?)
 }
 
 #[cfg(test)]
