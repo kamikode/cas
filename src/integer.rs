@@ -38,17 +38,27 @@ impl fmt::Display for Integer {
 mod tests {
     use super::*;
 
+    // The value -2^1024 in base 10 for testing purposes.
+    const BIG_INT_STR: &str = "-1797693134862315907729305190789024733617976978942306572734300811577\
+        3267580550096313270847732240753602112011387987139335765878976881441662249284743063947412437\
+        7767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237\
+        163350510684586298239947245938479716304835356329624224137216";
+
     #[test]
     fn from_bigint_works() {
-        let big_int = BigInt::from(100);
-        let integer = Integer::from(big_int);
-        assert_eq!(integer.0, rug::Integer::from(100));
+        let x = BigInt::parse_bytes(BIG_INT_STR.as_bytes(), 10).unwrap();
+        assert_eq!(
+            Integer::from(x).0,
+            rug::Integer::from_str_radix(BIG_INT_STR, 10).unwrap()
+        );
     }
 
     #[test]
     fn from_integer_works() {
-        let integer = Integer::from(100);
-        let big_int = BigInt::from(integer);
-        assert_eq!(big_int, BigInt::from(100));
+        let x = Integer(rug::Integer::from_str_radix(BIG_INT_STR, 10).unwrap());
+        assert_eq!(
+            BigInt::from(x),
+            BigInt::parse_bytes(BIG_INT_STR.as_bytes(), 10).unwrap()
+        );
     }
 }
