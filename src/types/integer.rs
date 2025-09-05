@@ -19,6 +19,14 @@ impl From<BigInt> for Integer {
     }
 }
 
+impl From<Integer> for BigInt {
+    #[inline]
+    fn from(value: Integer) -> Self {
+        // TODO: Make this conversion more efficient.
+        BigInt::parse_bytes(value.0.to_string_radix(36).as_bytes(), 36).unwrap()
+    }
+}
+
 impl fmt::Display for Integer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
@@ -31,8 +39,15 @@ mod tests {
 
     #[test]
     fn from_bigint_works() {
-        let value = BigInt::from(100);
-        let integer = Integer::from(value);
+        let big_int = BigInt::from(100);
+        let integer = Integer::from(big_int);
         assert_eq!(integer.0, rug::Integer::from(100));
+    }
+
+    #[test]
+    fn from_integer_works() {
+        let integer = Integer::from(100);
+        let big_int = BigInt::from(integer);
+        assert_eq!(big_int, BigInt::from(100));
     }
 }
