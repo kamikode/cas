@@ -1,7 +1,7 @@
 //! Expression.
-use crate::expression::Expression;
+use crate::Expression;
+use crate::Symbol;
 use crate::fmt::ToLatex;
-use crate::types::Symbol;
 use num_bigint::BigInt;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;

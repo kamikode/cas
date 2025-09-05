@@ -1,5 +1,5 @@
 use crate::fmt::Latex;
-use crate::types::{Integer, Symbol};
+use crate::{Integer, Symbol};
 use core::fmt;
 use core::ops::Add;
 

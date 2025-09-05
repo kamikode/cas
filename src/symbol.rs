@@ -1,5 +1,6 @@
 use core::fmt;
 
+/// A symbol that may represent a variable or a function.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Symbol(String);
 

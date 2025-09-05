@@ -1,6 +1,7 @@
 use core::fmt;
 use num_bigint::BigInt;
 
+/// An (arbitrarily large) integer.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Integer(rug::Integer);
 
