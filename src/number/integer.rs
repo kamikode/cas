@@ -3,7 +3,7 @@ use num_bigint::BigInt;
 
 /// An (arbitrarily large) integer.
 #[derive(Debug, Clone, PartialEq)]
-pub struct Integer(rug::Integer);
+pub struct Integer(pub(super) rug::Integer);
 
 impl From<i64> for Integer {
     #[inline]

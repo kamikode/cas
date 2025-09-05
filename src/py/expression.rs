@@ -1,7 +1,7 @@
 //! Expression.
 use crate::Expression;
-use crate::Symbol;
 use crate::fmt::ToLatex;
+use crate::symbol::Symbol;
 use num_bigint::BigInt;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
@@ -21,8 +21,8 @@ impl From<PyExpressionOrNumber<'_>> for Expression {
     fn from(other: PyExpressionOrNumber<'_>) -> Expression {
         match other {
             PyExpressionOrNumber::PyExpression(e) => e.0.clone(),
-            PyExpressionOrNumber::Int(i) => Expression::Integer(i.into()),
-            PyExpressionOrNumber::BigInt(i) => Expression::Integer(i.into()),
+            PyExpressionOrNumber::Int(i) => Expression::Number(i.into()),
+            PyExpressionOrNumber::BigInt(i) => Expression::Number(i.into()),
         }
     }
 }

@@ -1,13 +1,14 @@
 use crate::fmt::Latex;
-use crate::{Integer, Symbol};
+use crate::number::Number;
+use crate::symbol::Symbol;
 use core::fmt;
 use core::ops::Add;
 
 /// A mathematical expression.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
-    /// An integer.
-    Integer(Integer),
+    /// A number.
+    Number(Number),
     /// A variable specified by a symbol, like 'x'.
     Variable(Symbol),
     /// Binary addition operation.
@@ -25,7 +26,7 @@ impl Add<Expression> for Expression {
 impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Expression::Integer(i) => write!(f, "{i}"),
+            Expression::Number(i) => write!(f, "{i}"),
             Expression::Variable(s) => write!(f, "{s}"),
             Expression::Add(a, b) => write!(f, "({a} + {b})"),
         }
@@ -35,7 +36,7 @@ impl fmt::Display for Expression {
 impl Latex for Expression {
     fn latex(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Expression::Integer(i) => write!(f, "{i}"),
+            Expression::Number(i) => write!(f, "{i}"),
             Expression::Variable(s) => write!(f, "{s}"),
             Expression::Add(a, b) => {
                 write!(f, r"\left(")?;
