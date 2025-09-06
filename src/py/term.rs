@@ -44,7 +44,7 @@ impl PyTerm {
 
 /// Creates a symbol.
 #[pyfunction(name = "Variable")]
-pub(in crate::py) fn variable(name: String) -> PyResult<PyTerm> {
+pub(in crate::py) fn variable(name: &str) -> PyResult<PyTerm> {
     match Symbol::try_from(name) {
         Ok(s) => Ok(PyTerm(Term::Variable(s))),
         Err(e) => Err(PyErr::new::<PyValueError, String>(e)),
