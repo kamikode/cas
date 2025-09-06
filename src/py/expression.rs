@@ -30,17 +30,11 @@ impl From<PyExpressionOrNumber<'_>> for Expression {
 #[pymethods]
 impl PyExpression {
     fn __add__(&self, other: PyExpressionOrNumber) -> PyExpression {
-        PyExpression(Expression::Add(
-            Box::new(self.0.clone()),
-            Box::new(other.into()),
-        ))
+        PyExpression(self.0.clone() + other.into())
     }
 
     fn __radd__(&self, other: PyExpressionOrNumber) -> PyExpression {
-        PyExpression(Expression::Add(
-            Box::new(other.into()),
-            Box::new(self.0.clone()),
-        ))
+        PyExpression(Expression::from(other) + self.0.clone())
     }
 
     fn _repr_latex_(&self) -> String {

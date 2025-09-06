@@ -3,6 +3,7 @@ use crate::number::Number;
 use crate::symbol::Symbol;
 use core::fmt;
 use core::ops::Add;
+use std::collections::VecDeque;
 
 /// A mathematical expression.
 #[derive(Debug, Clone, PartialEq)]
@@ -11,15 +12,29 @@ pub enum Expression {
     Number(Number),
     /// A variable specified by a symbol, like 'x'.
     Variable(Symbol),
-    /// Binary addition operation.
-    Add(Box<Expression>, Box<Expression>),
+    /// A sum over subexpressions.
+    Sum(VecDeque<Expression>),
 }
 
 impl Add<Expression> for Expression {
     type Output = Expression;
 
     fn add(self, other: Expression) -> Expression {
-        Expression::Add(Box::new(self), Box::new(other))
+        match (self, other) {
+            (Expression::Sum(mut summands_self), Expression::Sum(mut summands_other)) => {
+                summands_self.append(&mut summands_other);
+                Expression::Sum(summands_self)
+            }
+            (Expression::Sum(mut summands), x) => {
+                summands.push_back(x);
+                Expression::Sum(summands)
+            }
+            (x, Expression::Sum(mut summands)) => {
+                summands.push_front(x);
+                Expression::Sum(summands)
+            }
+            (x, y) => Expression::Sum(vec![x, y].into()),
+        }
     }
 }
 
@@ -28,7 +43,16 @@ impl fmt::Display for Expression {
         match self {
             Expression::Number(i) => write!(f, "{i}"),
             Expression::Variable(s) => write!(f, "{s}"),
-            Expression::Add(a, b) => write!(f, "({a} + {b})"),
+            Expression::Sum(es) => {
+                write!(f, "(")?;
+                for (i, e) in es.iter().enumerate() {
+                    write!(f, "{e}")?;
+                    if i < es.len() - 1 {
+                        write!(f, " + ")?;
+                    }
+                }
+                write!(f, ")")
+            }
         }
     }
 }
@@ -38,11 +62,14 @@ impl Latex for Expression {
         match self {
             Expression::Number(i) => write!(f, "{i}"),
             Expression::Variable(s) => write!(f, "{s}"),
-            Expression::Add(a, b) => {
+            Expression::Sum(es) => {
                 write!(f, r"\left(")?;
-                a.latex(f)?;
-                write!(f, r" + ")?;
-                b.latex(f)?;
+                for (i, e) in es.iter().enumerate() {
+                    e.latex(f)?;
+                    if i < es.len() - 1 {
+                        write!(f, r" + ")?;
+                    }
+                }
                 write!(f, r"\right)")
             }
         }
@@ -54,10 +81,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn add_works() {
+    fn add_op_works() {
         let x = Expression::Variable(Symbol::try_from("x".to_string()).unwrap());
         let y = Expression::Variable(Symbol::try_from("y".to_string()).unwrap());
-        let expected = Expression::Add(Box::new(x.clone()), Box::new(y.clone()));
-        assert_eq!(x + y, expected);
+        let z = Expression::Variable(Symbol::try_from("z".to_string()).unwrap());
+        let expected = Expression::Sum(VecDeque::from([x.clone(), y.clone(), z.clone()]));
+        assert_eq!(x + y + z, expected);
     }
 }

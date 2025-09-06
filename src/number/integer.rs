@@ -45,7 +45,7 @@ mod tests {
         163350510684586298239947245938479716304835356329624224137216";
 
     #[test]
-    fn from_bigint_works() {
+    fn from_bigint_to_integer_works() {
         let x = BigInt::parse_bytes(BIG_INT_STR.as_bytes(), 10).unwrap();
         assert_eq!(
             Integer::from(x).0,
@@ -54,7 +54,7 @@ mod tests {
     }
 
     #[test]
-    fn from_integer_works() {
+    fn from_integer_to_bigint_works() {
         let x = Integer(rug::Integer::from_str_radix(BIG_INT_STR, 10).unwrap());
         assert_eq!(
             BigInt::from(x),
