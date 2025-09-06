@@ -1,40 +1,40 @@
 //! Expression.
-use crate::Expression;
+use crate::Term;
 use crate::fmt::ToLatex;
 use crate::symbol::Symbol;
 use num_bigint::BigInt;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 
-#[pyclass(name = "Expression", module = "cas")]
+#[pyclass(name = "Term", module = "cas")]
 #[derive(Debug)]
-pub struct PyExpression(pub Expression);
+pub struct PyTerm(pub Term);
 
 #[derive(FromPyObject)]
-enum PyExpressionOrNumber<'py> {
-    PyExpression(PyRef<'py, PyExpression>),
+enum PyTermOrNumber<'py> {
+    PyExpression(PyRef<'py, PyTerm>),
     Int(i64),
     BigInt(BigInt),
 }
 
-impl From<PyExpressionOrNumber<'_>> for Expression {
-    fn from(other: PyExpressionOrNumber<'_>) -> Expression {
+impl From<PyTermOrNumber<'_>> for Term {
+    fn from(other: PyTermOrNumber<'_>) -> Term {
         match other {
-            PyExpressionOrNumber::PyExpression(e) => e.0.clone(),
-            PyExpressionOrNumber::Int(i) => Expression::Number(i.into()),
-            PyExpressionOrNumber::BigInt(i) => Expression::Number(i.into()),
+            PyTermOrNumber::PyExpression(e) => e.0.clone(),
+            PyTermOrNumber::Int(i) => Term::Constant(i.into()),
+            PyTermOrNumber::BigInt(i) => Term::Constant(i.into()),
         }
     }
 }
 
 #[pymethods]
-impl PyExpression {
-    fn __add__(&self, other: PyExpressionOrNumber) -> PyExpression {
-        PyExpression(self.0.clone() + other.into())
+impl PyTerm {
+    fn __add__(&self, other: PyTermOrNumber) -> PyTerm {
+        PyTerm(self.0.clone() + other.into())
     }
 
-    fn __radd__(&self, other: PyExpressionOrNumber) -> PyExpression {
-        PyExpression(Expression::from(other) + self.0.clone())
+    fn __radd__(&self, other: PyTermOrNumber) -> PyTerm {
+        PyTerm(Term::from(other) + self.0.clone())
     }
 
     fn _repr_latex_(&self) -> String {
@@ -44,9 +44,9 @@ impl PyExpression {
 
 /// Creates a symbol.
 #[pyfunction(name = "Variable")]
-pub(in crate::py) fn variable(name: String) -> PyResult<PyExpression> {
+pub(in crate::py) fn variable(name: String) -> PyResult<PyTerm> {
     match Symbol::try_from(name) {
-        Ok(s) => Ok(PyExpression(Expression::Variable(s))),
+        Ok(s) => Ok(PyTerm(Term::Variable(s))),
         Err(e) => Err(PyErr::new::<PyValueError, String>(e)),
     }
 }
