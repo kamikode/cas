@@ -2,13 +2,13 @@
 
 use pyo3::prelude::*;
 
-mod expression;
+mod term;
 
 /// This module is implemented in Rust.
 #[pymodule]
 fn cas(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<expression::PyTerm>()?;
-    m.add_function(wrap_pyfunction!(expression::variable, m)?)
+    m.add_class::<term::PyTerm>()?;
+    m.add_function(wrap_pyfunction!(term::variable, m)?)
 }
 
 #[cfg(test)]
