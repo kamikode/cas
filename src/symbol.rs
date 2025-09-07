@@ -5,7 +5,7 @@ use core::fmt;
 pub struct Symbol(String);
 
 impl TryFrom<&str> for Symbol {
-    type Error = String;
+    type Error = String; // TODO: Use a custom error type.
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         // TODO: There should be more checks here.

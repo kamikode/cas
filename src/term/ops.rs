@@ -5,7 +5,6 @@ use core::ops::{Add, AddAssign, Neg, Sub, SubAssign};
 impl Add<Term> for Term {
     type Output = Term;
 
-    #[inline]
     fn add(mut self, other: Term) -> Term {
         self += other;
         self
@@ -14,7 +13,7 @@ impl Add<Term> for Term {
 
 impl AddAssign<Term> for Term {
     fn add_assign(&mut self, other: Term) {
-        *self = match (mem::replace(self, Term::zero()), other) {
+        *self = match (mem::replace(self, Term::Undefined), other) {
             (Term::Sum(mut summands_self), Term::Sum(mut summands_other)) => {
                 summands_self.append(&mut summands_other);
                 Term::Sum(summands_self)
@@ -35,7 +34,6 @@ impl AddAssign<Term> for Term {
 impl Neg for Term {
     type Output = Term;
 
-    #[inline]
     fn neg(self) -> Term {
         Term::Neg(Box::new(self))
     }
@@ -44,14 +42,12 @@ impl Neg for Term {
 impl Sub<Term> for Term {
     type Output = Term;
 
-    #[inline]
     fn sub(self, other: Term) -> Term {
         self + (-other)
     }
 }
 
 impl SubAssign<Term> for Term {
-    #[inline]
     fn sub_assign(&mut self, other: Term) {
         *self += -other;
     }

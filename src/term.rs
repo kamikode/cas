@@ -10,6 +10,8 @@ mod ops;
 /// A mathematical term.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Term {
+    /// An undefined term (e.g. division by zero).
+    Undefined,
     /// A constant value specified by a number.
     Constant(Number),
     /// A variable specified by a symbol, like 'x'.
@@ -23,11 +25,13 @@ pub enum Term {
 }
 
 impl Term {
+    /// The number 0 (additive identity).
+    pub const ZERO: Self = Self::Constant(Number::ZERO);
+
     /// Returns a term that represents the constant zero.
-    #[inline]
     #[must_use]
-    pub fn zero() -> Self {
-        Term::Constant(Number::zero())
+    pub const fn zero() -> Self {
+        Self::ZERO
     }
 }
 

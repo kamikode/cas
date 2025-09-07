@@ -1,19 +1,42 @@
-use core::fmt;
+use delegate::delegate;
+use derive_more::Display;
 use num_bigint::BigInt;
 
 /// An (arbitrarily large) integer.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Integer(pub(super) rug::Integer);
+#[derive(Debug, Display, Clone, PartialEq)]
+pub struct Integer(rug::Integer);
 
-impl From<i64> for Integer {
-    #[inline]
-    fn from(value: i64) -> Self {
-        Integer(rug::Integer::from(value))
+impl Integer {
+    pub const ZERO: Self = Self(rug::Integer::ZERO);
+
+    pub const fn zero() -> Self {
+        Self::ZERO
+    }
+
+    delegate! {
+        to self.0 {
+            pub fn is_zero(&self) -> bool;
+        }
     }
 }
 
+/// Helper macro to implement `From` for `Integer` by delegating to `rug::Integer`.
+macro_rules! impl_from {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for Integer {
+                fn from(value: $t) -> Self {
+                    Self(value.into())
+                }
+            }
+        )*
+    };
+}
+impl_from!(
+    bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
+);
+
 impl From<BigInt> for Integer {
-    #[inline]
     fn from(value: BigInt) -> Self {
         // TODO: Make this conversion more efficient.
         Self(rug::Integer::from_str_radix(&value.to_str_radix(36), 36).unwrap())
@@ -21,16 +44,9 @@ impl From<BigInt> for Integer {
 }
 
 impl From<Integer> for BigInt {
-    #[inline]
     fn from(value: Integer) -> Self {
         // TODO: Make this conversion more efficient.
         BigInt::parse_bytes(value.0.to_string_radix(36).as_bytes(), 36).unwrap()
-    }
-}
-
-impl fmt::Display for Integer {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
     }
 }
 

@@ -1,39 +1,78 @@
 use core::fmt;
 mod integer;
+use derive_more::Display;
 use num_bigint::BigInt;
 
-pub use integer::Integer;
+use integer::Integer;
 
-/// A number.
-#[derive(Debug, Clone, PartialEq)]
-pub enum Number {
+#[derive(Debug, Display, Clone, PartialEq)]
+enum NumberComponent {
     Integer(Integer),
 }
 
+/// A number.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Number {
+    real: NumberComponent,
+    imag: NumberComponent,
+}
+
+impl NumberComponent {
+    pub fn is_zero(&self) -> bool {
+        match self {
+            NumberComponent::Integer(i) => i.is_zero(),
+        }
+    }
+}
+
 impl Number {
-    pub fn zero() -> Self {
-        Number::Integer(Integer::from(0))
+    pub const ZERO: Self = Self {
+        real: NumberComponent::Integer(Integer::ZERO),
+        imag: NumberComponent::Integer(Integer::ZERO),
+    };
+
+    pub const fn zero() -> Self {
+        Self::ZERO
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.real.is_zero() && self.imag.is_zero()
     }
 }
 
 impl From<i64> for Number {
-    #[inline]
     fn from(value: i64) -> Self {
-        Number::Integer(Integer::from(value))
+        Self {
+            real: NumberComponent::Integer(value.into()),
+            imag: NumberComponent::Integer(Integer::ZERO),
+        }
+    }
+}
+
+impl From<BigInt> for NumberComponent {
+    fn from(value: BigInt) -> Self {
+        NumberComponent::Integer(Integer::from(value))
     }
 }
 
 impl From<BigInt> for Number {
-    #[inline]
     fn from(value: BigInt) -> Self {
-        Number::Integer(Integer::from(value))
+        Self {
+            real: NumberComponent::Integer(Integer::from(value)),
+            imag: NumberComponent::Integer(Integer::ZERO),
+        }
     }
 }
 
 impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Number::Integer(i) => write!(f, "{i}"),
+        let Number { real, imag } = self;
+        if imag.is_zero() {
+            write!(f, "{real}")
+        } else if real.is_zero() {
+            write!(f, "{imag}i")
+        } else {
+            write!(f, "{real} + {imag}i")
         }
     }
 }
