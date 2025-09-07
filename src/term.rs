@@ -22,5 +22,14 @@ pub enum Term {
     // division/reciprocals, so this does not need to be an extra case.
 }
 
+impl Term {
+    /// Returns a term that represents the constant zero.
+    #[inline]
+    #[must_use]
+    pub fn zero() -> Self {
+        Term::Constant(Number::zero())
+    }
+}
+
 #[cfg(test)]
 mod tests {}

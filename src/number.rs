@@ -10,6 +10,12 @@ pub enum Number {
     Integer(Integer),
 }
 
+impl Number {
+    pub fn zero() -> Self {
+        Number::Integer(Integer::from(0))
+    }
+}
+
 impl From<i64> for Number {
     #[inline]
     fn from(value: i64) -> Self {
