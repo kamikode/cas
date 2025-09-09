@@ -1,6 +1,8 @@
 use core::fmt;
 mod integer;
 use derive_more::Display;
+
+#[cfg(feature = "python")]
 use num_bigint::BigInt;
 
 use integer::Integer;
@@ -17,14 +19,6 @@ pub struct Number {
     imag: NumberComponent,
 }
 
-impl NumberComponent {
-    pub fn is_zero(&self) -> bool {
-        match self {
-            NumberComponent::Integer(i) => i.is_zero(),
-        }
-    }
-}
-
 impl Number {
     pub const ZERO: Self = Self {
         real: NumberComponent::Integer(Integer::ZERO),
@@ -36,25 +30,35 @@ impl Number {
     }
 
     pub fn is_zero(&self) -> bool {
-        self.real.is_zero() && self.imag.is_zero()
-    }
-}
-
-impl From<i64> for Number {
-    fn from(value: i64) -> Self {
-        Self {
-            real: NumberComponent::Integer(value.into()),
-            imag: NumberComponent::Integer(Integer::ZERO),
+        match self {
+            Number {
+                real: NumberComponent::Integer(r),
+                imag: NumberComponent::Integer(i),
+            } => r.is_zero() && i.is_zero(),
         }
     }
 }
 
-impl From<BigInt> for NumberComponent {
-    fn from(value: BigInt) -> Self {
-        NumberComponent::Integer(Integer::from(value))
-    }
+/// Helper macro to implement `From` for `Number` by delegating to `Integer`.
+macro_rules! impl_from_integer {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for Number {
+                fn from(value: $t) -> Self {
+                    Self {
+                        real: NumberComponent::Integer(value.into()),
+                        imag: NumberComponent::Integer(Integer::ZERO),
+                    }
+                }
+            }
+        )*
+    };
 }
+impl_from_integer!(
+    bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
+);
 
+#[cfg(feature = "python")]
 impl From<BigInt> for Number {
     fn from(value: BigInt) -> Self {
         Self {
@@ -66,13 +70,74 @@ impl From<BigInt> for Number {
 
 impl fmt::Display for Number {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let Number { real, imag } = self;
-        if imag.is_zero() {
-            write!(f, "{real}")
-        } else if real.is_zero() {
-            write!(f, "{imag}i")
-        } else {
-            write!(f, "{real} + {imag}i")
+        match self {
+            Number {
+                real: NumberComponent::Integer(r),
+                imag: NumberComponent::Integer(i),
+            } => {
+                if i.is_zero() {
+                    write!(f, "{r}")
+                } else if r.is_zero() {
+                    write!(f, "{i}i")
+                } else {
+                    write!(f, "{r} + {i}i")
+                }
+            }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_integer_implementations_work() {
+        assert_eq!(Number::from(false), Number::ZERO);
+        assert_eq!(Number::from(0i8), Number::ZERO);
+        assert_eq!(Number::from(0i16), Number::ZERO);
+        assert_eq!(Number::from(0i32), Number::ZERO);
+        assert_eq!(Number::from(0i64), Number::ZERO);
+        assert_eq!(Number::from(0isize), Number::ZERO);
+        assert_eq!(Number::from(0u8), Number::ZERO);
+        assert_eq!(Number::from(0u16), Number::ZERO);
+        assert_eq!(Number::from(0u32), Number::ZERO);
+        assert_eq!(Number::from(0u64), Number::ZERO);
+        assert_eq!(Number::from(0usize), Number::ZERO);
+    }
+
+    #[test]
+    fn display_works() {
+        assert_eq!(Number::ZERO.to_string(), "0");
+        assert_eq!(
+            Number {
+                real: NumberComponent::Integer(Integer::ZERO),
+                imag: NumberComponent::Integer(2.into()),
+            }
+            .to_string(),
+            "i"
+        );
+        assert_eq!(
+            Number {
+                real: NumberComponent::Integer(Integer::ZERO),
+                imag: NumberComponent::Integer(2.into()),
+            }
+            .to_string(),
+            "2i"
+        );
+        assert_eq!(
+            Number {
+                real: NumberComponent::Integer(3.into()),
+                imag: NumberComponent::Integer(2.into()),
+            }
+            .to_string(),
+            "3 + 2i"
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "python")]
+    fn from_bigint_works() {
+        assert_eq!(Number::from(BigInt::ZERO), Number::ZERO);
     }
 }

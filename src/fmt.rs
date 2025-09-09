@@ -8,6 +8,7 @@ pub trait Latex {
 }
 
 /// A helper trait to convert a type to a LaTeX string (analogous to `ToString`).
+#[allow(unused)] // TODO: Remove this at some point.
 pub trait ToLatex {
     /// Converts a type to a LaTeX string.
     fn to_latex(&self) -> String;

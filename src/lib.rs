@@ -2,9 +2,11 @@
 #![warn(missing_debug_implementations, missing_docs, clippy::pedantic)]
 pub(crate) mod fmt;
 mod number;
-pub(crate) mod py;
 mod symbol;
 pub(crate) mod term;
+
+#[cfg(feature = "python")]
+mod py;
 
 pub use term::Term;
 

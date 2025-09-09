@@ -7,11 +7,15 @@ edition = "2024"
 name = "cas"
 crate-type = ["cdylib", "rlib"]
 
+[features]
+default = ["python"]
+python = ["dep:pyo3", "dep:num-bigint"]
+
 [dependencies]
 rug = "1"
 derive_more = { version = "2", features = ["display"] }
 delegate = "0.13"
-num-bigint = "*"
-pyo3 = { version = "0.26", features = ["num-bigint"] }
+num-bigint = { version = "*", optional = true }
+pyo3 = { version = "0.26", features = ["num-bigint"], optional = true }
 
 [dev-dependencies]
