@@ -12,6 +12,14 @@ enum NumberComponent {
     Integer(Integer),
 }
 
+impl NumberComponent {
+    fn is_zero(&self) -> bool {
+        match self {
+            NumberComponent::Integer(i) => i.is_zero(),
+        }
+    }
+}
+
 /// A number.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Number {
@@ -25,17 +33,8 @@ impl Number {
         imag: NumberComponent::Integer(Integer::ZERO),
     };
 
-    pub const fn zero() -> Self {
-        Self::ZERO
-    }
-
     pub fn is_zero(&self) -> bool {
-        match self {
-            Number {
-                real: NumberComponent::Integer(r),
-                imag: NumberComponent::Integer(i),
-            } => r.is_zero() && i.is_zero(),
-        }
+        self.real.is_zero() && self.imag.is_zero()
     }
 }
 
