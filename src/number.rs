@@ -77,7 +77,11 @@ impl fmt::Display for Number {
                 if i.is_zero() {
                     write!(f, "{r}")
                 } else if r.is_zero() {
-                    write!(f, "{i}i")
+                    if i == &1 {
+                        write!(f, "i")
+                    } else {
+                        write!(f, "{i}i")
+                    }
                 } else {
                     write!(f, "{r} + {i}i")
                 }
@@ -111,7 +115,7 @@ mod tests {
         assert_eq!(
             Number {
                 real: NumberComponent::Integer(Integer::ZERO),
-                imag: NumberComponent::Integer(2.into()),
+                imag: NumberComponent::Integer(1.into()),
             }
             .to_string(),
             "i"
